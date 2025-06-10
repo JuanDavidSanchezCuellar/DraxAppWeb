@@ -1,11 +1,9 @@
-<%@ page import="java.sql.*" %>
-<%@ page import="util.ConexionBD" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>VER COMENTARIOS DRAXGAMES</title>
+        <title>AGREGAR COMENTARIOS DRAXGAMES</title>
         <style>
             @font-face {
                 font-family: 'ND LOGOS REGULAR';
@@ -26,7 +24,6 @@
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                justify-content: center;
                 width: 90%;
                 max-width: 500px;
             }
@@ -34,7 +31,7 @@
                 color: #ffffff;
                 text-align: center;
                 font-size: 2em;
-                margin-bottom: 20px;
+                margin: 20px 0;
             }
             form {
                 display: flex;
@@ -43,10 +40,9 @@
                 gap: 15px;
                 width: 100%;
             }
-            input[type="text"] {
+            input[type="text"], textarea {
                 width: 100%;
                 padding: 10px;
-                margin-left: 10px;
                 border: 1px solid #ffffff;
                 border-radius: 5px;
                 background-color: #333333;
@@ -54,10 +50,13 @@
                 font-family: 'ND LOGOS REGULAR', sans-serif;
                 font-size: 16px;
             }
+            textarea {
+                resize: none;
+                height: 100px;
+            }
             button {
                 width: 100%;
                 padding: 12px;
-                margin-left: 10px;
                 background-color: #b1384ad8;
                 color: white;
                 border: none;
@@ -76,60 +75,22 @@
                 justify-content: center;
                 margin-top: 20px;
             }
-            .comments-section {
-                margin-top: 30px;
-                text-align: left;
-                width: 100%;
-            }
         </style>
     </head>
     <body>
         <div class="content">
-            <h2>Ver Comentarios</h2>
-            <form method="post">
-                <label>ID del Juego:</label>
-                <input type="text" name="juegoId" required>
-                <button type="submit">Buscar</button>
+            <h2>Agregar Comentarios</h2>
+            <form action="ComentarioServlet" method="post">
+                <input type="hidden" name="accion" value="agregar">
+                <input type="text" name="usuario_id" placeholder="ID del usuario"><br>
+                <input type="text" name="juego" placeholder="ID del juego"><br>
+                <textarea name="comentario" placeholder="Comentario"></textarea><br>
+                <button type="submit">Enviar comentario</button>
             </form>
             <div class="button-container">
                 <a href="index.jsp"><button>Volver al Inicio</button></a>
             </div>
-            <div class="comments-section">
-                <%
-                    String juegoId = request.getParameter("juegoId");
-
-                    if (juegoId != null && !juegoId.isEmpty()) {
-                        try {
-                            Connection conn = ConexionBD.obtenerConexion();
-                            PreparedStatement ps = conn.prepareStatement(
-                                "SELECT c.comentario, u.nombre FROM comentarios c JOIN users u ON c.user_id = u.id WHERE juego_id = ?");
-                            ps.setInt(1, Integer.parseInt(juegoId));
-                            ResultSet rs = ps.executeQuery();
-                %>
-                <h3>Comentarios para Juego ID: <%= juegoId %></h3>
-                <ul>
-                <%
-                    boolean hayComentarios = false;
-                    while (rs.next()) {
-                        hayComentarios = true;
-                %>
-                    <li><strong><%= rs.getString("nombre") %>:</strong> <%= rs.getString("comentario") %></li>
-                <%
-                    }
-                    if (!hayComentarios) {
-                %>
-                    <p>No hay comentarios para este juego.</p>
-                <%
-                    }
-                    rs.close();
-                    ps.close();
-                    conn.close();
-                } catch (Exception e) {
-                    out.println("Error al cargar comentarios: " + e.getMessage());
-                }
-            }
-                %>
-            </div>
         </div>
     </body>
 </html>
+
